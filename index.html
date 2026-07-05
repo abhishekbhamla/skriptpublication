@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Script Publication — Infinite Stories. Infinite Possibilities.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --ink:#0e1526;
+  --ink-2:#182241;
+  --ink-3:#212d52;
+  --parchment:#f8f4ea;
+  --parchment-2:#efe7d4;
+  --gold:#c9a05c;
+  --gold-light:#e3c489;
+  --gold-deep:#9c7830;
+  --text-dark:#1b2030;
+  --text-muted:#5b6178;
+  --text-on-ink:#e9e6de;
+  --text-on-ink-muted:#a9adc4;
+  --line-light:rgba(28,32,50,0.12);
+  --line-ink:rgba(233,230,222,0.14);
+  --shadow-soft: 0 20px 50px rgba(14,21,38,0.14);
+  --radius-lg: 18px;
+  --radius-md: 12px;
+  --ease: cubic-bezier(.22,.68,0,1);
+}
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+}
+*,*::before,*::after{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; }
+body{
+  margin:0;
+  background:var(--parchment);
+  color:var(--text-dark);
+  font-family:'Lora', Georgia, serif;
+  line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,h4{ font-family:'Playfair Display', Georgia, serif; margin:0; letter-spacing:-0.01em; }
+p{ margin:0; }
+a{ color:inherit; text-decoration:none; }
+img{ max-width:100%; display:block; }
+.wrap{ max-width:1180px; margin:0 inline auto; margin-left:auto; margin-right:auto; padding:0 32px; }
+.eyebrow{
+  font-family:'Inter',sans-serif;
+  font-size:12.5px;
+  font-weight:600;
+  letter-spacing:0.22em;
+  text-transform:uppercase;
+  color:var(--gold-deep);
+  display:flex; align-items:center; gap:12px;
+}
+.eyebrow::before{
+  content:""; width:28px; height:1px; background:var(--gold-deep); display:inline-block;
+}
+.eyebrow.on-ink{ color:var(--gold-light); }
+.eyebrow.on-ink::before{ background:var(--gold-light); }
+.roman{ font-family:'Playfair Display',serif; font-style:italic; font-weight:600; }
+
+/* ============ INK SCROLL PROGRESS ============ */
+#ink-progress{
+  position:fixed; top:0; left:18px; width:2px; height:100vh; z-index:60;
+  background:rgba(28,32,50,0.08); display:none;
+}
+#ink-progress::after{
+  content:""; position:absolute; top:0; left:0; width:100%;
+  height:var(--fill,0%);
+  background:linear-gradient(var(--gold-deep), var(--gold));
+  transition:height .08s linear;
+}
+@media (min-width:1000px){ #ink-progress{ display:block; } }
+
+/* ============ HEADER ============ */
+header{
+  position:sticky; top:0; z-index:50;
+  background:rgba(14,21,38,0.86);
+  backdrop-filter:blur(14px) saturate(140%);
+  -webkit-backdrop-filter:blur(14px) saturate(140%);
+  border-bottom:1px solid var(--line-ink);
+}
+.nav{
+  display:flex; align-items:center; justify-content:space-between;
+  padding:16px 32px; max-width:1180px; margin:0 auto;
+}
+.brand{ display:flex; align-items:center; gap:12px; }
+.brand svg{ width:38px; height:38px; }
+.brand-word{
+  font-family:'Playfair Display',serif; font-weight:700; font-size:19px;
+  letter-spacing:0.06em; color:var(--text-on-ink);
+  text-transform:uppercase;
+}
+.brand-sub{
+  display:block; font-family:'Inter',sans-serif; font-size:9.5px; letter-spacing:0.2em;
+  color:var(--gold-light); text-transform:uppercase; margin-top:1px;
+}
+.nav-links{ display:flex; align-items:center; gap:34px; }
+.nav-links a{
+  font-family:'Inter',sans-serif; font-size:13.5px; font-weight:500;
+  color:var(--text-on-ink-muted); letter-spacing:0.02em;
+  position:relative; padding:4px 0;
+  transition:color .25s var(--ease);
+}
+.nav-links a::after{
+  content:""; position:absolute; left:0; bottom:-2px; width:0; height:1px; background:var(--gold);
+  transition:width .3s var(--ease);
+}
+.nav-links a:hover{ color:var(--text-on-ink); }
+.nav-links a:hover::after{ width:100%; }
+.nav-cta{
+  font-family:'Inter',sans-serif; font-weight:600; font-size:13px;
+  color:var(--ink) !important; background:linear-gradient(135deg,var(--gold-light),var(--gold));
+  padding:10px 20px; border-radius:999px; letter-spacing:0.02em;
+  box-shadow:0 8px 20px rgba(201,160,92,0.25);
+}
+.nav-cta::after{ display:none; }
+.nav-cta:hover{ filter:brightness(1.06); }
+.burger{ display:none; width:24px; height:18px; position:relative; cursor:pointer; background:none; border:0; }
+.burger span{ position:absolute; left:0; width:100%; height:2px; background:var(--text-on-ink); transition:.3s; }
+.burger span:nth-child(1){ top:0; } .burger span:nth-child(2){ top:8px; } .burger span:nth-child(3){ top:16px; }
+.burger.open span:nth-child(1){ transform:translateY(8px) rotate(45deg); }
+.burger.open span:nth-child(2){ opacity:0; }
+.burger.open span:nth-child(3){ transform:translateY(-8px) rotate(-45deg); }
+
+@media (max-width:900px){
+  .nav-links{
+    position:fixed; top:70px; left:0; right:0; background:var(--ink-2);
+    flex-direction:column; align-items:flex-start; gap:0; padding:8px 32px 20px;
+    transform:translateY(-12px); opacity:0; pointer-events:none; transition:.3s var(--ease);
+    border-bottom:1px solid var(--line-ink);
+  }
+  .nav-links.open{ transform:translateY(0); opacity:1; pointer-events:auto; }
+  .nav-links a{ width:100%; padding:13px 0; border-bottom:1px solid var(--line-ink); }
+  .nav-cta{ margin-top:14px; text-align:center; }
+  .burger{ display:block; }
+}
+
+/* ============ HERO ============ */
+.hero{
+  position:relative; background:radial-gradient(120% 100% at 80% 0%, #16204a 0%, var(--ink) 55%);
+  color:var(--text-on-ink); padding:96px 0 0; overflow:hidden;
+}
+.hero::before{
+  content:""; position:absolute; inset:0; opacity:0.5; pointer-events:none;
+  background-image:
+    repeating-linear-gradient(180deg, rgba(233,230,222,0.028) 0px, rgba(233,230,222,0.028) 1px, transparent 1px, transparent 34px);
+}
+.hero-grid{
+  max-width:1180px; margin:0 auto; padding:0 32px;
+  display:grid; grid-template-columns:1.05fr 0.85fr; gap:40px; align-items:center;
+  position:relative; z-index:2;
+}
+.hero h1{
+  font-size:clamp(40px,5.4vw,72px); line-height:1.04; font-weight:700; color:#fbf9f4;
+  margin-top:22px;
+}
+.hero h1 em{ font-style:italic; color:var(--gold-light); font-weight:600; }
+.hero p.lede{
+  font-size:18px; color:var(--text-on-ink-muted); max-width:480px; margin-top:22px;
+  font-family:'Lora',serif;
+}
+.hero-ctas{ display:flex; gap:16px; margin-top:36px; flex-wrap:wrap; }
+.btn{
+  font-family:'Inter',sans-serif; font-weight:600; font-size:14px; letter-spacing:0.02em;
+  padding:15px 28px; border-radius:999px; display:inline-flex; align-items:center; gap:10px;
+  cursor:pointer; border:1px solid transparent; transition:.3s var(--ease);
+}
+.btn-gold{
+  background:linear-gradient(135deg,var(--gold-light),var(--gold)); color:var(--ink);
+  box-shadow:0 12px 30px rgba(201,160,92,0.28);
+}
+.btn-gold:hover{ transform:translateY(-2px); box-shadow:0 16px 34px rgba(201,160,92,0.38); }
+.btn-outline{ color:var(--text-on-ink); border-color:rgba(233,230,222,0.35); }
+.btn-outline:hover{ border-color:var(--gold-light); color:var(--gold-light); }
+.btn-outline.dark{ color:var(--text-dark); border-color:rgba(27,32,48,0.3); }
+.btn-outline.dark:hover{ border-color:var(--gold-deep); color:var(--gold-deep); }
+
+.hero-mark{ position:relative; display:flex; justify-content:center; align-items:center; }
+.hero-mark svg{ width:min(100%,380px); height:auto; filter:drop-shadow(0 30px 60px rgba(0,0,0,0.45)); }
+.draw{ stroke-dasharray:1400; stroke-dashoffset:1400; animation:draw 2.6s var(--ease) forwards .3s; }
+@keyframes draw{ to{ stroke-dashoffset:0; } }
+.fade-in-mark{ opacity:0; animation:fadeMark 1s ease forwards 2.2s; }
+@keyframes fadeMark{ to{ opacity:1; } }
+
+.ribbon{
+  margin-top:70px; border-top:1px solid var(--line-ink); border-bottom:1px solid var(--line-ink);
+  background:rgba(255,255,255,0.02); overflow:hidden; position:relative; z-index:2;
+}
+.ribbon-track{
+  display:flex; gap:56px; padding:16px 0; white-space:nowrap; width:max-content;
+  animation:scroll-x 26s linear infinite;
+  font-family:'Inter',sans-serif; font-size:12.5px; letter-spacing:0.14em; text-transform:uppercase;
+  color:var(--text-on-ink-muted);
+}
+.ribbon-track span{ display:inline-flex; align-items:center; gap:10px; }
+.ribbon-track span::before{ content:"◆"; color:var(--gold); font-size:8px; }
+@keyframes scroll-x{ from{ transform:translateX(0); } to{ transform:translateX(-50%); } }
+
+@media (max-width:900px){
+  .hero-grid{ grid-template-columns:1fr; }
+  .hero-mark{ order:-1; margin-bottom:8px; }
+  .hero-mark svg{ width:220px; }
+}
+
+/* ============ REVEAL ============ */
+.reveal{ opacity:0; transform:translateY(26px); transition:opacity .8s var(--ease), transform .8s var(--ease); }
+.reveal.in{ opacity:1; transform:translateY(0); }
+
+/* ============ SECTION SHELL ============ */
+section{ padding:120px 0; position:relative; }
+.section-head{ max-width:640px; margin-bottom:56px; }
+.section-head h2{ font-size:clamp(30px,3.6vw,44px); margin-top:16px; }
+.section-head p{ margin-top:16px; color:var(--text-muted); font-size:16.5px; }
+
+/* ============ ABOUT ============ */
+.about{ background:var(--parchment); }
+.about-grid{ display:grid; grid-template-columns:1fr 1fr; gap:70px; align-items:start; }
+.about-statement{ font-family:'Playfair Display',serif; font-style:italic; font-weight:500; font-size:clamp(22px,2.5vw,30px); line-height:1.4; color:var(--text-dark); }
+.about-statement .amp{ color:var(--gold-deep); }
+.about-copy{ color:var(--text-muted); font-size:16px; margin-top:22px; }
+.about-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:24px; margin-top:44px; }
+.stat-mini b{ display:block; font-family:'Playfair Display',serif; font-size:36px; color:var(--gold-deep); }
+.stat-mini span{ font-family:'Inter',sans-serif; font-size:11.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--text-muted); }
+
+.about-panel{
+  background:var(--ink); color:var(--text-on-ink); border-radius:var(--radius-lg);
+  padding:42px; box-shadow:var(--shadow-soft); position:relative; overflow:hidden;
+}
+.about-panel::after{
+  content:""; position:absolute; right:-40px; bottom:-40px; width:200px; height:200px;
+  border:1px solid rgba(233,230,222,0.12); border-radius:50%;
+}
+.about-panel ul{ list-style:none; margin:24px 0 0; padding:0; display:grid; gap:16px; }
+.about-panel li{ display:flex; gap:14px; align-items:flex-start; font-family:'Lora',serif; font-size:15px; color:var(--text-on-ink-muted); }
+.about-panel li svg{ flex:none; width:20px; height:20px; margin-top:2px; }
+
+@media (max-width:900px){ .about-grid{ grid-template-columns:1fr; gap:44px; } .about-stats{ grid-template-columns:repeat(3,1fr); } }
+
+/* ============ PACKAGES ============ */
+.packages{ background:var(--parchment-2); }
+.pkg-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:28px; align-items:stretch; }
+.pkg-card{
+  background:#fffefb; border:1px solid var(--line-light); border-radius:var(--radius-lg);
+  padding:36px 32px; display:flex; flex-direction:column; position:relative;
+  transition:transform .35s var(--ease), box-shadow .35s var(--ease);
+}
+.pkg-card:hover{ transform:translateY(-6px); box-shadow:var(--shadow-soft); }
+.pkg-card.featured{ border-color:var(--gold); background:linear-gradient(180deg,#fffefb, #fbf3e2); }
+.pkg-tag{
+  position:absolute; top:-13px; right:28px; background:var(--gold); color:var(--ink);
+  font-family:'Inter',sans-serif; font-size:10.5px; font-weight:700; letter-spacing:0.1em;
+  text-transform:uppercase; padding:6px 14px; border-radius:999px;
+}
+.pkg-name{ font-family:'Inter',sans-serif; font-size:12px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold-deep); font-weight:600; }
+.pkg-title{ font-size:26px; margin-top:10px; }
+.pkg-price{ font-family:'Playfair Display',serif; font-size:38px; margin-top:16px; color:var(--text-dark); }
+.pkg-price sup{ font-size:14px; font-family:'Inter',sans-serif; color:var(--text-muted); }
+.pkg-list{ list-style:none; padding:0; margin:26px 0 32px; display:grid; gap:13px; flex:1; }
+.pkg-list li{ display:flex; gap:10px; font-size:14.5px; color:var(--text-muted); }
+.pkg-list li svg{ flex:none; width:17px; height:17px; margin-top:3px; color:var(--gold-deep); }
+.pkg-btn{
+  font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px; text-align:center;
+  padding:13px; border-radius:10px; border:1.5px solid var(--ink); color:var(--ink);
+  transition:.3s var(--ease);
+}
+.pkg-card.featured .pkg-btn{ background:var(--ink); color:#fff; }
+.pkg-btn:hover{ background:var(--ink); color:#fff; }
+
+/* ---- estimator ---- */
+.estimator{
+  margin-top:60px; background:#fffefb; border:1px solid var(--line-light); border-radius:var(--radius-lg);
+  padding:40px; display:grid; grid-template-columns:1fr 1fr; gap:44px; align-items:center;
+  box-shadow:var(--shadow-soft);
+}
+.estimator h3{ font-size:24px; }
+.estimator p{ color:var(--text-muted); margin-top:10px; font-size:15px; }
+.est-field{ display:flex; flex-direction:column; gap:6px; margin-bottom:16px; }
+.est-field label{ font-family:'Inter',sans-serif; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-muted); }
+.est-field input, .est-field select{
+  font-family:'Inter',sans-serif; font-size:14px; padding:12px 14px; border-radius:8px;
+  border:1px solid var(--line-light); background:var(--parchment); color:var(--text-dark);
+}
+.est-field input:focus, .est-field select:focus{ outline:2px solid var(--gold); outline-offset:1px; }
+.est-result{
+  background:var(--ink); color:var(--text-on-ink); border-radius:var(--radius-md); padding:26px;
+  text-align:center;
+}
+.est-result span{ font-family:'Inter',sans-serif; font-size:11.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-on-ink-muted); }
+.est-result b{ display:block; font-family:'Playfair Display',serif; font-size:38px; color:var(--gold-light); margin-top:10px; }
+.est-result small{ display:block; margin-top:8px; color:var(--text-on-ink-muted); font-size:12px; }
+
+@media (max-width:900px){ .pkg-grid{ grid-template-columns:1fr; } .estimator{ grid-template-columns:1fr; padding:28px; } }
+
+/* ============ SERVICES ============ */
+.services{ background:var(--ink); color:var(--text-on-ink); }
+.services .section-head p{ color:var(--text-on-ink-muted); }
+.svc-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line-ink); border:1px solid var(--line-ink); border-radius:var(--radius-lg); overflow:hidden; }
+.svc-card{
+  background:var(--ink); padding:34px 26px; transition:background .3s var(--ease);
+  display:flex; flex-direction:column; gap:16px;
+}
+.svc-card:hover{ background:var(--ink-2); }
+.svc-card svg{ width:30px; height:30px; color:var(--gold-light); }
+.svc-card h4{ font-size:18px; color:#fbf9f4; font-weight:600; }
+.svc-card p{ font-size:13.5px; color:var(--text-on-ink-muted); line-height:1.55; }
+.svc-num{ font-family:'Inter',sans-serif; font-size:11px; color:var(--gold-deep); letter-spacing:0.1em; }
+
+@media (max-width:900px){ .svc-grid{ grid-template-columns:repeat(2,1fr); } }
+@media (max-width:560px){ .svc-grid{ grid-template-columns:1fr; } }
+
+/* ============ CTA BAND ============ */
+.cta-band{
+  background:linear-gradient(120deg,var(--gold-deep),var(--gold));
+  color:var(--ink); text-align:center; padding:90px 0;
+}
+.cta-band h2{ font-size:clamp(28px,3.4vw,42px); }
+.cta-band p{ margin-top:16px; font-size:16.5px; opacity:.85; max-width:520px; margin-inline:auto; }
+.cta-band .hero-ctas{ justify-content:center; margin-top:32px; }
+.cta-band .btn-gold{ background:var(--ink); color:#fbf9f4; box-shadow:0 12px 30px rgba(14,21,38,0.28); }
+.cta-band .btn-outline{ color:var(--ink); border-color:rgba(14,21,38,0.35); }
+.cta-band .btn-outline:hover{ border-color:var(--ink); color:var(--ink); }
+
+/* ============ FOOTER ============ */
+footer{ background:var(--ink); color:var(--text-on-ink-muted); padding:80px 0 30px; }
+.foot-grid{ display:grid; grid-template-columns:1.4fr 1fr 1fr 1.1fr; gap:50px; padding-bottom:56px; border-bottom:1px solid var(--line-ink); }
+.foot-brand{ display:flex; align-items:center; gap:12px; }
+.foot-brand svg{ width:36px; height:36px; }
+.foot-tagline{ margin-top:18px; font-family:'Playfair Display',serif; font-style:italic; color:var(--text-on-ink); font-size:17px; max-width:260px; }
+.foot-col h5{ font-family:'Inter',sans-serif; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--gold-light); margin-bottom:20px; }
+.foot-col a, .foot-col li{ display:block; font-size:14px; margin-bottom:12px; color:var(--text-on-ink-muted); transition:color .25s; list-style:none; }
+.foot-col a:hover{ color:var(--gold-light); }
+.foot-social{ display:flex; gap:12px; margin-top:20px; }
+.foot-social a{ width:36px; height:36px; border-radius:50%; border:1px solid var(--line-ink); display:flex; align-items:center; justify-content:center; }
+.foot-social a:hover{ border-color:var(--gold-light); }
+.foot-social svg{ width:16px; height:16px; }
+.foot-bottom{ display:flex; justify-content:space-between; align-items:center; padding-top:26px; font-size:12.5px; flex-wrap:wrap; gap:10px; }
+@media (max-width:900px){ .foot-grid{ grid-template-columns:1fr 1fr; } }
+@media (max-width:560px){ .foot-grid{ grid-template-columns:1fr; } .wrap{ padding:0 22px; } .about-stats{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+
+<div id="ink-progress"></div>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <nav class="nav">
+    <a href="#top" class="brand">
+      <img src="logo.png"
+     alt="Script Publication Logo"
+     style="width: 50px;height:50px;object-fit:contain;">
+      <span>
+        <span class="brand-word">Script</span>
+        <span class="brand-sub">Publication</span>
+      </span>
+    </a>
+    <div class="nav-links" id="navLinks">
+      <a href="#about">About</a>
+      <a href="#packages">Packages</a>
+      <a href="#services">Services</a>
+      <a href="#contact">Contact</a>
+      <a href="#contact" class="nav-cta">Start Your Book</a>
+    </div>
+    <button class="burger" id="burger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </nav>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="hero-grid">
+    <div>
+      <div class="eyebrow on-ink">Chapter I — Prologue</div>
+      <h1>Infinite Stories.<br><em>Infinite</em> Possibilities.</h1>
+      <p class="lede">Script Publication turns manuscripts into published books — full editorial support, ISBN registration, global distribution, and royalties that stay entirely yours.</p>
+      <div class="hero-ctas">
+        <a href="#packages" class="btn btn-gold">Publish With Us →</a>
+        <a href="#services" class="btn btn-outline">Explore Our Services</a>
+      </div>
+    </div>
+    <div class="hero-mark">
+      <svg viewBox="0 0 260 220" xmlns="http://www.w3.org/2000/svg">
+        <path class="draw" d="M130 110 C 95 60, 30 60, 30 110 C 30 160, 95 160, 130 110 C 165 60, 230 60, 230 110 C 230 160, 165 160, 130 110Z" fill="none" stroke="#c9a05c" stroke-width="4.5" stroke-linecap="round"/>
+        <path class="draw" d="M130 110 L180 30 M180 30 L192 18 M180 30 L168 30" fill="none" stroke="#e3c489" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <g class="fade-in-mark">
+          <path d="M95 128 C 108 120, 120 120, 130 126 C 140 120, 152 120, 165 128 L165 150 C 152 142, 140 142, 130 148 C 120 142, 108 142, 95 150 Z" fill="#f8f4ea" opacity="0.92"/>
+          <line x1="130" y1="126" x2="130" y2="148" stroke="#0e1526" stroke-width="1"/>
+        </g>
+      </svg>
+    </div>
+  </div>
+
+  <div class="ribbon">
+    <div class="ribbon-track" id="ribbon">
+      <span>ISBN Assigned</span><span>Global Distribution</span><span>100% Author Royalties</span><span>Dedicated Editor</span><span>Print &amp; Ebook</span><span>Author Dashboard</span>
+      <span>ISBN Assigned</span><span>Global Distribution</span><span>100% Author Royalties</span><span>Dedicated Editor</span><span>Print &amp; Ebook</span><span>Author Dashboard</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="about" id="about">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="reveal">
+        <div class="eyebrow">Chapter II — The Studio</div>
+        <p class="about-statement" style="margin-top:20px;">Every book starts as a private thought. We exist to give it a spine, a cover, <span class="amp">&amp;</span> a reader.</p>
+        <p class="about-copy">Founded by editors and printers who believe publishing shouldn't take a year or a fortune, Script Publication guides authors — first-timers and veterans alike — from finished draft to bound, distributed book. No hidden clauses, no surrendered rights.</p>
+        <div class="about-stats">
+          <div class="stat-mini"><b id="stat1">0</b><span>Years in Print</span></div>
+          <div class="stat-mini"><b id="stat2">0</b><span>Books Published</span></div>
+          <div class="stat-mini"><b id="stat3">0</b><span>Countries Reached</span></div>
+        </div>
+      </div>
+      <div class="about-panel reveal">
+        <div class="eyebrow on-ink">What Stays With You</div>
+        <h3 style="margin-top:14px; font-size:24px;">The Author's Bill of Rights</h3>
+        <ul>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#c9a05c" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>100% royalties on every copy sold, always</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#c9a05c" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>You retain full copyright of your work</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#c9a05c" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Live sales tracking from your own dashboard</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="#c9a05c" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Transparent, one-time publishing fee — no surprises</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PACKAGES ============ -->
+<section class="packages" id="packages">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow">Chapter III — Choose Your Edition</div>
+      <h2>Publishing packages, plainly priced</h2>
+      <p>Three ways to bring your manuscript into print — or build your own with the estimator below.</p>
+    </div>
+
+    <div class="pkg-grid">
+      <div class="pkg-card reveal">
+        <div class="pkg-name">The Manuscript</div>
+        <div class="pkg-title">Full Book Publication</div>
+        <div class="pkg-price">₹3,000<sup> +18% GST</sup></div>
+        <ul class="pkg-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>ISBN &amp; DOI registration</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Publication certificate</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Formatting &amp; cover design, 3 concepts</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Up to 250 pages</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>100% royalties, always</li>
+        </ul>
+        <a href="#contact" class="pkg-btn">Enquire Now</a>
+      </div>
+
+      <div class="pkg-card featured reveal">
+        <div class="pkg-tag">Most Chosen</div>
+        <div class="pkg-name">The Edited Volume</div>
+        <div class="pkg-title">Edited Book Publication</div>
+        <div class="pkg-price">₹4,000<sup> +18% GST</sup></div>
+        <ul class="pkg-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>ISBN &amp; DOI registration</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Up to 15 chapters, 250 pages</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Per-editor certificate of publication</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>2 complimentary editor copies</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Live sales dashboard access</li>
+        </ul>
+        <a href="#contact" class="pkg-btn">Enquire Now</a>
+      </div>
+
+      <div class="pkg-card reveal">
+        <div class="pkg-name">The Bespoke Edition</div>
+        <div class="pkg-title">Custom, Built With You</div>
+        <div class="pkg-price" style="font-size:24px;">Estimated below</div>
+        <ul class="pkg-list">
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Choose copies, pages &amp; binding</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Hardcover, paperback or ebook-only</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Priority editing turnaround</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>Dedicated production manager</li>
+          <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l4 4L19 6"/></svg>100% royalties, always</li>
+        </ul>
+        <a href="#estimator" class="pkg-btn">Build My Estimate</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section class="services" id="services">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="eyebrow on-ink">Chapter IV — What We Offer</div>
+      <h2>Every stage of the journey, covered</h2>
+      <p>From a raw first draft to a printed, distributed book — pick a single service or the full path.</p>
+    </div>
+    <div class="svc-grid reveal">
+      <div class="svc-card">
+        <span class="svc-num">01</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 4.5A2.5 2.5 0 016.5 2H20v17H6.5A2.5 2.5 0 014 16.5v-12z"/><path d="M4 16.5A2.5 2.5 0 016.5 19H20v3H6.5A2.5 2.5 0 014 19.5v-3z"/></svg>
+        <h4>Book Publication</h4>
+        <p>Full-length manuscripts, formatted, designed and registered with an ISBN, ready for shelves worldwide.</p>
+      </div>
+      <div class="svc-card">
+        <span class="svc-num">02</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="3" width="16" height="18" rx="1.5"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>
+        <h4>Edited Book Publication</h4>
+        <p>Multi-author volumes compiled, peer-reviewed and published as a single cohesive edition.</p>
+      </div>
+      <div class="svc-card">
+        <span class="svc-num">03</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h9l5 5v13H6z"/><path d="M15 3v5h5"/></svg>
+        <h4>Thesis Into Book</h4>
+        <p>Academic research reshaped into readable, publishable form without losing its scholarly rigour.</p>
+      </div>
+      <div class="svc-card">
+        <span class="svc-num">04</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+        <h4>Chapter in Edited Book</h4>
+        <p>Contribute a single chapter to a curated edited collection alongside fellow authors.</p>
+      </div>
+      <div class="svc-card">
+        <span class="svc-num">05</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 20l9-9-4-4-9 9v4h4z"/><path d="M14.5 6.5l3 3"/></svg>
+        <h4>Editorial Review</h4>
+        <p>Line editing, structural feedback and proofreading from editors matched to your genre.</p>
+      </div>
+      
+      <div class="svc-card">
+        <span class="svc-num">06</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M7 10h2M11 10h2M15 10h2M7 14h10"/></svg>
+        <h4>Writing &amp; Typing Support</h4>
+        <p>From dictation to full ghost-typing, we help transform notes and voice memos into manuscript pages.</p>
+      </div>
+      <div class="svc-card">
+        <span class="svc-num">07</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="1"/><path d="M6 17h12v4H6z"/></svg>
+        <h4>Printing &amp; Distribution</h4>
+        <p>On-demand printing plus listing across major retailers, so your book is never out of reach.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CONTACT ============ -->
+<section class="cta-band" id="contact">
+  <div class="wrap">
+
+    <div class="eyebrow" style="justify-content:center;color:rgba(14,21,38,0.65);">
+      Chapter V — Contact Us
+    </div>
+
+    <h2 style="margin-top:16px;">Let's Publish Your Book</h2>
+
+    <p>
+      Fill out the form below and our publishing team will contact you within one working day.
+    </p>
+
+    <div style="max-width:700px;margin:50px auto 0;">
+
+      <form action="https://api.web3forms.com/submit" method="POST">
+
+        <!-- Web3Forms Access Key -->
+        <input type="hidden" name="access_key" value="d77dc9ff-d41f-4900-9ea4-b481cda56e75">
+
+        <!-- Email Subject -->
+        <input type="hidden" name="subject" value="New Book Publication Enquiry">
+
+        <!-- From Name -->
+        <input type="hidden" name="from_name" value="Script Publication Website">
+
+        <!-- Spam Protection -->
+        <input type="checkbox" name="botcheck" style="display:none;">
+
+        <input
+          type="text"
+          name="name"
+          placeholder="Your Name"
+          required
+          style="width:100%;padding:16px;border:none;border-radius:10px;margin-bottom:18px;font-size:16px;">
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Your Email Address"
+          required
+          style="width:100%;padding:16px;border:none;border-radius:10px;margin-bottom:18px;font-size:16px;">
+
+        <input
+          type="tel"
+          name="phone"
+          placeholder="Your Phone Number"
+          required
+          style="width:100%;padding:16px;border:none;border-radius:10px;margin-bottom:18px;font-size:16px;">
+
+        <textarea
+          name="message"
+          rows="6"
+          placeholder="Tell us about your manuscript..."
+          required
+          style="width:100%;padding:16px;border:none;border-radius:10px;margin-bottom:20px;font-size:16px;resize:vertical;"></textarea>
+
+        <button
+          type="submit"
+          style="width:100%;padding:18px;background:#0e1526;color:#fff;border:none;border-radius:10px;font-size:17px;font-weight:600;cursor:pointer;">
+          Submit Enquiry
+        </button>
+
+      </form>
+
+      <div style="display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:35px;">
+
+        <a href="tel:+918571034427"
+           style="
+           display:inline-flex;
+           align-items:center;
+           justify-content:center;
+           background:#0e1526;
+           color:#fff;
+           padding:15px 35px;
+           border-radius:50px;
+           font-size:16px;
+           font-weight:600;
+           text-decoration:none;
+           box-shadow:0 10px 25px rgba(0,0,0,.25);
+           transition:.3s;">
+           📞 Call Now
+        </a>
+    
+        <a href="https://wa.me/918571034427?text=Hello%20Script%20Publications,%20I%20want%20to%20publish%20my%20book."
+           target="_blank"
+           style="
+           display:inline-flex;
+           align-items:center;
+           justify-content:center;
+           background:#25D366;
+           color:#fff;
+           padding:15px 35px;
+           border-radius:50px;
+           font-size:16px;
+           font-weight:600;
+           text-decoration:none;
+           box-shadow:0 10px 25px rgba(37,211,102,.35);
+           transition:.3s;">
+           💬 WhatsApp Us
+        </a>
+    
+    </div>
+
+    </div>
+
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M50 50 C 35 30, 10 30, 10 50 C 10 70, 35 70, 50 50 C 65 30, 90 30, 90 50 C 90 70, 65 70, 50 50Z" stroke="#c9a05c" stroke-width="3.5"/>
+            <path d="M50 50 L68 20" stroke="#e3c489" stroke-width="3.5" stroke-linecap="round"/>
+          </svg>
+          <span class="brand-word" style="color:#fbf9f4;">Script Publication</span>
+        </div>
+        <p class="foot-tagline">Infinite Stories. Infinite Possibilities.</p>
+        <div class="foot-social">
+          <a href="https://www.instagram.com/scriptpublication?igsh=MWZ0NjJiYWhwdTI4eA==" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" stroke="#e9e6de" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></svg></a>
+          <a href="https://www.linkedin.com/in/script-publication-4a845b41b?utm_source=share_via&utm_content=profile&utm_medium=member_android" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" stroke="#e9e6de" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M7 10v7M7 7v.01M11 17v-4a2 2 0 014 0v4M11 13v4"/></svg></a>
+          <a href="https://www.facebook.com/share/18q55s5vb9/"
+          target="_blank"
+          aria-label="Facebook">
+       
+           <svg viewBox="0 0 24 24"
+                fill="none"
+                stroke="#e9e6de"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round">
+       
+               <path d="M15 3h-2.2C10.7 3 10 4.7 10 6.5V9H8v3h2v9h3v-9h2.5l.5-3H13V6.8c0-.9.2-1.3 1.2-1.3H16V3h-1z"/>
+       
+           </svg>
+       
+       </a>
+        </div>
+      </div>
+      <div class="foot-col">
+        <h5>Explore</h5>
+        <a href="#about">About Us</a>
+        <a href="#packages">Packages</a>
+        <a href="#services">Services</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <div class="foot-col">
+        <h5>Services</h5>
+        <a href="#services">Book Publication</a>
+        <a href="#services">Edited Volumes</a>
+        <a href="#services">Thesis to Book</a>
+        <a href="#services">Printing &amp; Distribution</a>
+      </div>
+      <div class="foot-col">
+        <h5>Reach Us</h5>
+        <a href="mailto:hello@scriptpublications.com">hello@scriptpublications.com</a>
+        <a href="tel:+918571034427">+91 8571034427</a>
+        <span style="display:block; font-size:14px; color:var(--text-on-ink-muted);">Mon–Sat, 10am–7pm IST</span>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Script Publication. All rights reserved.</span>
+      <span>Infinite Stories. Infinite Possibilities.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// mobile nav
+const burger = document.getElementById('burger');
+const navLinks = document.getElementById('navLinks');
+burger.addEventListener('click', ()=>{
+  burger.classList.toggle('open');
+  navLinks.classList.toggle('open');
+});
+navLinks.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{
+  burger.classList.remove('open'); navLinks.classList.remove('open');
+}));
+
+// ink scroll progress
+const ink = document.getElementById('ink-progress');
+function updateInk(){
+  const h = document.documentElement;
+  const scrolled = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  ink.style.setProperty('--fill', scrolled + '%');
+}
+document.addEventListener('scroll', updateInk);
+updateInk();
+
+// reveal on scroll
+const revealEls = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+  });
+},{ threshold:0.15 });
+revealEls.forEach(el=>io.observe(el));
+
+// count-up stats
+const stats = [
+  { el: document.getElementById('stat1'), target: 8, suffix:'+' },
+  { el: document.getElementById('stat2'), target: 620, suffix:'+' },
+  { el: document.getElementById('stat3'), target: 14, suffix:'+' },
+];
+let counted = false;
+const statSection = document.querySelector('.about-stats');
+const statIO = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting && !counted){
+      counted = true;
+      stats.forEach(s=>{
+        let cur = 0;
+        const step = Math.max(1, Math.round(s.target/40));
+        const timer = setInterval(()=>{
+          cur += step;
+          if(cur >= s.target){ cur = s.target; clearInterval(timer); }
+          s.el.textContent = cur + s.suffix;
+        }, 30);
+      });
+    }
+  });
+},{ threshold:0.4 });
+if(statSection) statIO.observe(statSection);
+
+// estimator
+const copiesEl = document.getElementById('copies');
+const pagesEl = document.getElementById('pages');
+const bindingEl = document.getElementById('binding');
+const estOut = document.getElementById('estOut');
+function calcEstimate(){
+  const copies = Math.max(1, parseInt(copiesEl.value) || 0);
+  const pages = Math.max(1, parseInt(pagesEl.value) || 0);
+  const mult = parseFloat(bindingEl.value);
+  const base = 2800 + pages * 14 + copies * 45;
+  const total = Math.round(base * mult);
+  estOut.textContent = '₹' + total.toLocaleString('en-IN');
+}
+[copiesEl,pagesEl,bindingEl].forEach(el=>el.addEventListener('input', calcEstimate));
+calcEstimate();
+</script>
+</body>
+</html>
